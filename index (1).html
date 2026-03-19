@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TennisAI Pro — Elevate Your Game</title>
+  <meta name="description" content="AI-powered tennis coaching platform. Technique analysis, training drills, match strategy and live streaming."/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎾</text></svg>"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--a:#C8FF00;--bg:#060A0F;--s1:#0D1826;--s2:#132232;--bo:#1C3248;--tp:#EEF2F7;--ts:#6B90AC}
+    body{background:var(--bg);color:var(--tp);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
+    nav{background:rgba(6,10,15,0.97);border-bottom:1px solid var(--bo);padding:0 24px;display:flex;align-items:center;gap:2px;position:sticky;top:0;z-index:50;overflow-x:auto}
+    .logo{font-size:17px;font-weight:900;color:var(--a);letter-spacing:2px;padding:16px;border-right:1px solid var(--bo);margin-right:8px;white-space:nowrap}
+    .tab{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--ts);padding:18px 14px 16px;font-size:10px;font-weight:700;letter-spacing:1.5px;cursor:pointer;white-space:nowrap;transition:all .15s;text-transform:uppercase}
+    .tab.active{color:var(--a);border-bottom-color:var(--a)}
+    .tab:hover:not(.active){color:var(--tp)}
+    .page{display:none}.page.active{display:block}
+    section{padding:48px 40px;max-width:1100px;margin:0 auto}
+    .tag{color:var(--a);font-size:10px;font-weight:700;letter-spacing:3px;margin-bottom:8px;text-transform:uppercase}
+    h1{font-size:clamp(52px,8vw,100px);font-weight:900;line-height:.92;letter-spacing:-2px;color:var(--tp);text-transform:uppercase}
+    h1 span{color:var(--a)}
+    h2{font-size:36px;font-weight:900;letter-spacing:-0.5px;text-transform:uppercase;margin-bottom:8px}
+    .sub{color:var(--ts);font-size:14px;line-height:1.65}
+    .line{width:48px;height:2px;background:var(--a);border-radius:1px;margin:14px 0 32px}
+    .btn{background:var(--a);color:var(--bg);border:none;padding:13px 24px;font-size:11px;font-weight:700;letter-spacing:2px;cursor:pointer;border-radius:4px;text-transform:uppercase;transition:opacity .15s}
+    .btn:hover{opacity:.88}
+    .btn-out{background:transparent;color:var(--tp);border:1px solid var(--bo);padding:13px 24px;font-size:11px;font-weight:600;cursor:pointer;border-radius:4px;transition:all .15s}
+    .btn-out:hover{border-color:var(--a);color:var(--a)}
+    .card{background:var(--s1);border:1px solid var(--bo);border-radius:8px;padding:22px}
+    label{color:var(--ts);font-size:10px;letter-spacing:1.5px;display:block;margin-bottom:8px;text-transform:uppercase}
+    input,textarea,select{width:100%;background:var(--s2);border:1px solid var(--bo);border-radius:5px;padding:10px 12px;color:var(--tp);font-size:13px;font-family:inherit}
+    textarea{resize:vertical}
+    .grid2{display:grid;grid-template-columns:1fr 1.1fr;gap:22px}
+    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .result-panel{background:var(--s1);border:1px solid var(--bo);border-radius:8px;padding:24px;min-height:400px}
+    .ai-text{font-size:13px;line-height:1.85;color:var(--tp);white-space:pre-wrap}
+    .pill{display:inline-block;padding:3px 10px;border-radius:3px;font-size:10px;font-weight:700;letter-spacing:1px}
+    .hero{min-height:88vh;display:flex;flex-direction:column;justify-content:center;padding:64px 40px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 15% 50%,rgba(200,255,0,.05),transparent 55%),radial-gradient(ellipse at 85% 20%,rgba(0,100,200,.07),transparent 45%),var(--bg)}
+    .hero-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:32px}
+    .hero-stats{display:flex;gap:36px;margin-top:48px;padding-top:32px;border-top:1px solid var(--bo);flex-wrap:wrap}
+    .stat-n{font-size:28px;font-weight:900;color:var(--a)}
+    .stat-l{font-size:10px;color:var(--ts);letter-spacing:1px;text-transform:uppercase}
+    .shot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+    .shot-btn{background:var(--s2);border:1px solid var(--bo);color:var(--ts);padding:8px 4px;font-size:11px;font-weight:600;cursor:pointer;border-radius:4px;transition:all .15s;text-align:center}
+    .shot-btn.sel,.shot-btn:hover{background:rgba(200,255,0,.12);border-color:var(--a);color:var(--a)}
+    .level-row{display:flex;gap:6px}
+    .level-btn{flex:1;background:var(--s2);border:1px solid var(--bo);color:var(--ts);padding:8px;font-size:10px;font-weight:600;cursor:pointer;border-radius:4px;transition:all .15s}
+    .level-btn.sel{background:rgba(200,255,0,.12);border-color:var(--a);color:var(--a)}
+    .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:340px;color:var(--a);gap:12px}
+    .spin{animation:spin 1.2s linear infinite;display:inline-block;font-size:44px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:340px;color:var(--ts);text-align:center}
+    .drill-card{background:var(--s1);border:1px solid var(--bo);border-radius:8px;padding:16px;cursor:pointer;transition:all .2s}
+    .drill-card:hover,.drill-card.sel{border-color:var(--a);background:rgba(200,255,0,.05)}
+    .drills-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .style-btn{background:var(--s1);border:1px solid var(--bo);color:var(--ts);padding:9px 14px;text-align:left;font-size:12px;cursor:pointer;border-radius:4px;width:100%;margin-bottom:5px;transition:all .15s}
+    .style-btn.sel{background:rgba(200,255,0,.1);border-color:var(--a);color:var(--a)}
+    .surf-row{display:flex;gap:5px;margin-bottom:16px}
+    .surf-btn{flex:1;background:var(--s2);border:1px solid var(--bo);color:var(--ts);padding:8px;font-size:10px;font-weight:700;cursor:pointer;border-radius:4px;text-align:center;transition:all .15s}
+    .surf-btn.sel{background:rgba(200,255,0,.12);border-color:var(--a);color:var(--a)}
+    .prod-card{background:var(--s1);border:1px solid var(--bo);border-radius:8px;padding:18px;transition:border .2s}
+    .prod-card:hover{border-color:rgba(200,255,0,.4)}
+    .prod-img{font-size:44px;text-align:center;padding:18px 0;background:var(--s2);border-radius:6px;margin-bottom:14px}
+    .match-row{background:var(--s1);border:1px solid var(--bo);border-radius:8px;padding:14px 20px;display:flex;align-items:center;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+    .match-row.live-match{border-color:rgba(255,60,60,.3)}
+    .live-dot{width:7px;height:7px;border-radius:50%;background:#FF4444;display:inline-block;margin-right:5px;animation:pulse 1.5s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .msg-user{display:flex;justify-content:flex-end;margin-bottom:12px}
+    .msg-ai{display:flex;gap:10px;margin-bottom:12px}
+    .bubble-u{background:rgba(200,255,0,.1);border:1px solid rgba(200,255,0,.25);padding:10px 14px;border-radius:12px 12px 2px 12px;max-width:75%;font-size:13px;line-height:1.6}
+    .bubble-a{background:var(--s2);border:1px solid var(--bo);padding:10px 14px;border-radius:12px 12px 12px 2px;max-width:80%;font-size:13px;line-height:1.6;white-space:pre-wrap}
+    .ai-avatar{width:30px;height:30px;border-radius:50%;background:rgba(200,255,0,.15);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:2px}
+    .chat-wrap{background:var(--s1);border:1px solid var(--bo);border-radius:8px;max-width:860px}
+    .chat-msgs{height:440px;overflow-y:auto;padding:20px 20px 10px}
+    .chat-chips{padding:10px 14px 0;display:flex;gap:7px;flex-wrap:wrap;border-top:1px solid var(--bo)}
+    .chip{background:var(--s2);border:1px solid var(--bo);color:var(--ts);padding:5px 12px;font-size:11px;cursor:pointer;border-radius:20px;transition:all .15s}
+    .chip:hover{border-color:var(--a);color:var(--a)}
+    .chat-bar{display:flex;gap:8px;padding:14px;border-top:1px solid var(--bo)}
+    @media(max-width:700px){section{padding:32px 20px}.grid2{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}h1{font-size:52px}}
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">🎾 TENNISAI PRO</div>
+  <button class="tab active" onclick="goto('home',this)">HOME</button>
+  <button class="tab" onclick="goto('technique',this)">TECHNIQUE</button>
+  <button class="tab" onclick="goto('drills',this)">DRILLS</button>
+  <button class="tab" onclick="goto('strategy',this)">STRATEGY</button>
+  <button class="tab" onclick="goto('equipment',this)">EQUIPMENT</button>
+  <button class="tab" onclick="goto('streaming',this)">LIVE</button>
+  <button class="tab" onclick="goto('coach',this)">AI COACH</button>
+</nav>
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div id="court-svg" style="position:absolute;top:0;right:0;opacity:.04;pointer-events:none"></div>
+    <div style="position:relative;z-index:1;max-width:860px">
+      <div style="background:var(--a);color:var(--bg);font-size:10px;font-weight:700;letter-spacing:3px;padding:6px 13px;border-radius:2px;display:inline-block;margin-bottom:22px">⚡ POWERED BY CLAUDE AI</div>
+      <h1>ELEVATE<br><span>YOUR GAME</span></h1>
+      <p class="sub" style="max-width:440px;margin-top:18px;font-size:16px">The world's most advanced AI tennis coaching platform. Master technique, dominate strategy, train smarter.</p>
+      <div class="hero-btns">
+        <button class="btn" onclick="goto('technique',document.querySelectorAll('.tab')[1])">🎾 ANALYZE TECHNIQUE</button>
+        <button class="btn" onclick="goto('coach',document.querySelectorAll('.tab')[6])" style="background:transparent;color:var(--tp);border:1px solid var(--bo)">🤖 AI COACH</button>
+        <button class="btn-out" onclick="goto('streaming',document.querySelectorAll('.tab')[5])">📺 WATCH LIVE</button>
+      </div>
+      <div class="hero-stats">
+        <div><div class="stat-n">4</div><div class="stat-l">Core Pillars</div></div>
+        <div><div class="stat-n">AI</div><div class="stat-l">Video Analysis</div></div>
+        <div><div class="stat-n">∞</div><div class="stat-l">Drill Library</div></div>
+        <div><div class="stat-n">LIVE</div><div class="stat-l">Match Streaming</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TECHNIQUE -->
+<div id="page-technique" class="page">
+  <section>
+    <div class="tag">PILLAR 01</div>
+    <h2>TECHNIQUE ANALYSIS</h2>
+    <p class="sub">Upload your video or describe your issue — AI delivers biomechanical feedback</p>
+    <div class="line"></div>
+    <div class="grid2">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div>
+          <label>SHOT TYPE *</label>
+          <div class="shot-grid" id="shots">
+            <button class="shot-btn" onclick="selShot(this)">Forehand</button>
+            <button class="shot-btn" onclick="selShot(this)">Backhand</button>
+            <button class="shot-btn" onclick="selShot(this)">Serve</button>
+            <button class="shot-btn" onclick="selShot(this)">Volley</button>
+            <button class="shot-btn" onclick="selShot(this)">Overhead</button>
+            <button class="shot-btn" onclick="selShot(this)">Drop Shot</button>
+            <button class="shot-btn" onclick="selShot(this)">Lob</button>
+          </div>
+        </div>
+        <div>
+          <label>SKILL LEVEL</label>
+          <div class="level-row">
+            <button class="level-btn" onclick="selLevel(this)">Beginner</button>
+            <button class="level-btn sel" onclick="selLevel(this)">Intermediate</button>
+            <button class="level-btn" onclick="selLevel(this)">Advanced</button>
+            <button class="level-btn" onclick="selLevel(this)">Pro</button>
+          </div>
+        </div>
+        <div>
+          <label>DESCRIBE YOUR ISSUE</label>
+          <textarea id="techIssue" rows="3" placeholder="e.g. My serve keeps going into the net, losing power on forehand..."></textarea>
+        </div>
+        <button class="btn" id="techBtn" onclick="analyzeTech()" style="opacity:.5;cursor:not-allowed">🎾 ANALYZE MY TECHNIQUE</button>
+      </div>
+      <div class="result-panel" id="techResult">
+        <div class="empty"><div style="font-size:52px">🧠</div><div style="color:var(--tp);font-weight:700;margin:10px 0 6px">AI Analysis Ready</div><div style="font-size:12px">Select a shot type and click Analyze</div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- DRILLS -->
+<div id="page-drills" class="page">
+  <section>
+    <div class="tag">PILLAR 02</div>
+    <h2>TRAINING DRILLS</h2>
+    <p class="sub">Click any drill for AI-powered coaching instructions and progressions</p>
+    <div class="line"></div>
+    <div class="grid2">
+      <div class="drills-grid" id="drillGrid"></div>
+      <div class="result-panel" id="drillResult">
+        <div class="empty"><div style="font-size:52px">⚡</div><div style="color:var(--tp);font-weight:700;margin:10px 0 6px">Select a Drill</div><div style="font-size:12px">Click any card for AI coaching</div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- STRATEGY -->
+<div id="page-strategy" class="page">
+  <section>
+    <div class="tag">PILLAR 03</div>
+    <h2>MATCH STRATEGY</h2>
+    <p class="sub">AI builds a personalized tactical game plan for your next match</p>
+    <div class="line"></div>
+    <div class="grid2">
+      <div>
+        <label>YOUR PLAY STYLE</label>
+        <div id="stylesBtns">
+          <button class="style-btn" onclick="selStyle(this)">Aggressive Baseliner</button>
+          <button class="style-btn" onclick="selStyle(this)">Defensive Counter-Puncher</button>
+          <button class="style-btn" onclick="selStyle(this)">All-Court Player</button>
+          <button class="style-btn" onclick="selStyle(this)">Serve &amp; Volley</button>
+          <button class="style-btn" onclick="selStyle(this)">Heavy Topspin Specialist</button>
+        </div>
+        <label>COURT SURFACE</label>
+        <div class="surf-row">
+          <button class="surf-btn sel" onclick="selSurf(this)">HARD</button>
+          <button class="surf-btn" onclick="selSurf(this)">CLAY</button>
+          <button class="surf-btn" onclick="selSurf(this)">GRASS</button>
+          <button class="surf-btn" onclick="selSurf(this)">CARPET</button>
+        </div>
+        <div style="margin-bottom:12px">
+          <label>YOUR MAIN WEAKNESS</label>
+          <input id="stratWeak" placeholder="e.g. weak backhand, poor net play..."/>
+        </div>
+        <div style="margin-bottom:16px">
+          <label>OPPONENT'S STYLE</label>
+          <input id="stratOpp" placeholder="e.g. heavy topspin, big server..."/>
+        </div>
+        <button class="btn" style="width:100%" onclick="genStrategy()">🏆 GENERATE STRATEGY</button>
+      </div>
+      <div class="result-panel" id="stratResult">
+        <div class="empty"><div style="font-size:52px">🏆</div><div style="color:var(--tp);font-weight:700;margin:10px 0 6px">Strategy Engine</div><div style="font-size:12px">Fill in your details and generate a game plan</div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- EQUIPMENT -->
+<div id="page-equipment" class="page">
+  <section>
+    <div class="tag">PILLAR 04</div>
+    <h2>EQUIPMENT</h2>
+    <p class="sub">Partner-sourced gear from the world's leading tennis brands</p>
+    <div class="line"></div>
+    <div style="background:var(--s1);border:1px solid var(--bo);border-radius:8px;padding:14px 22px;margin-bottom:20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span style="color:var(--ts);font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-right:4px">Partners:</span>
+      <span id="partners"></span>
+    </div>
+    <div style="background:linear-gradient(135deg,#0C2618,#091E2C);border:1px solid var(--a);border-radius:8px;padding:18px 28px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <div>
+        <div style="color:var(--a);font-size:10px;font-weight:700;letter-spacing:2px;margin-bottom:4px">LIMITED OFFER</div>
+        <div style="color:var(--tp);font-size:16px;font-weight:700">20% OFF all Wilson rackets this week</div>
+        <div style="color:var(--ts);font-size:12px;margin-top:3px">Use code TENNISAI20 at checkout</div>
+      </div>
+      <button class="btn">SHOP NOW →</button>
+    </div>
+    <div class="grid3" id="products"></div>
+  </section>
+</div>
+
+<!-- STREAMING -->
+<div id="page-streaming" class="page">
+  <section>
+    <div class="tag">PILLAR 05</div>
+    <h2>LIVE STREAMING</h2>
+    <p class="sub">Every ATP &amp; WTA match streamed live from every major tournament</p>
+    <div class="line"></div>
+    <div id="matches"></div>
+  </section>
+</div>
+
+<!-- COACH -->
+<div id="page-coach" class="page">
+  <section>
+    <div class="tag">AI COACH</div>
+    <h2>TENNIS AI COACH</h2>
+    <p class="sub">Your personal AI coaching assistant — powered by Claude with live web search</p>
+    <div class="line"></div>
+    <div class="chat-wrap">
+      <div class="chat-msgs" id="chatMsgs"></div>
+      <div class="chat-chips" id="chatChips"></div>
+      <div class="chat-bar">
+        <input id="chatInput" placeholder="Ask your AI tennis coach anything..." onkeydown="if(event.key==='Enter')sendChat()" style="flex:1"/>
+        <button class="btn" onclick="sendChat()">SEND →</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+// ── Navigation ──
+function goto(id,tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(tab)tab.classList.add('active');
+}
+
+// ── AI helper ──
+// AI calls routed through secure Vercel API — no key exposed!
+async function ai(messages,system){
+  const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages,system})});
+  const d=await r.json();
+  if(d.error)throw new Error(d.error);
+  return d.result||'No response.';
+}
+
+// ── Technique ──
+let selShotVal='',selLevelVal='Intermediate';
+function selShot(btn){document.querySelectorAll('.shot-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');selShotVal=btn.textContent;document.getElementById('techBtn').style.opacity='1';document.getElementById('techBtn').style.cursor='pointer'}
+function selLevel(btn){document.querySelectorAll('.level-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');selLevelVal=btn.textContent}
+async function analyzeTech(){
+  if(!selShotVal)return;
+  const issue=document.getElementById('techIssue').value;
+  const r=document.getElementById('techResult');
+  r.innerHTML='<div class="loading"><span class="spin">⚙️</span><div style="font-weight:600">Analyzing your technique...</div></div>';
+  try{
+    const t=await ai([{role:'user',content:`Analyze my ${selShotVal} technique. Level: ${selLevelVal}. ${issue?'Issue: '+issue:''}`}],`You are an elite tennis coach & biomechanics expert. Give structured analysis with:\n🎯 KEY ISSUES DETECTED\n⚙️ BIOMECHANICAL ANALYSIS\n💪 3 CORRECTION DRILLS\n📈 PROGRESSION PLAN\nBe specific and actionable. ~280 words.`);
+    r.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--bo)"><span class="pill" style="background:rgba(200,255,0,.12);color:var(--a)">${selShotVal.toUpperCase()}</span><span style="color:var(--ts);font-size:12px">${selLevelVal}</span></div><div class="ai-text">${t}</div>`;
+  }catch{r.innerHTML='<div class="empty">Analysis failed. Please try again.</div>';}
+}
+
+// ── Drills ──
+const DRILLS=[
+  {name:'Shadow Swings',cat:'Technique',diff:'Beginner',dur:'10 min',icon:'🎭',desc:'Perfect mechanics without the ball'},
+  {name:'Wall Rally',cat:'Consistency',diff:'Beginner',dur:'15 min',icon:'🧱',desc:'Build consistency on a practice wall'},
+  {name:'Cone Footwork',cat:'Fitness',diff:'Intermediate',dur:'20 min',icon:'🔺',desc:'Rapid direction changes for court coverage'},
+  {name:'Cross-Court Rally',cat:'Consistency',diff:'Intermediate',dur:'30 min',icon:'↗️',desc:'Maintain deep cross-court shots'},
+  {name:'Serve Targets',cat:'Serve',diff:'Intermediate',dur:'20 min',icon:'🎯',desc:'Hit cones in service box for accuracy'},
+  {name:'Approach & Volley',cat:'Net Play',diff:'Advanced',dur:'25 min',icon:'⚡',desc:'Rush net after approach, finish with volley'},
+  {name:'Topspin Baseline',cat:'Power',diff:'Advanced',dur:'30 min',icon:'🌀',desc:'Generate heavy topspin under pressure'},
+  {name:'Mental Reset',cat:'Mental',diff:'All levels',dur:'10 min',icon:'🧘',desc:'Breathing & visualization between points'},
+];
+function diffColor(d){return d==='Beginner'?{bg:'rgba(0,200,100,.12)',c:'#00C864'}:d==='Intermediate'?{bg:'rgba(255,180,0,.12)',c:'#FFB400'}:d==='Advanced'?{bg:'rgba(255,80,80,.12)',c:'#FF5050'}:{bg:'rgba(200,255,0,.12)',c:'#C8FF00'}}
+const dg=document.getElementById('drillGrid');
+DRILLS.forEach((d,i)=>{
+  const dc=diffColor(d.diff);
+  const el=document.createElement('div');el.className='drill-card';
+  el.innerHTML=`<div style="font-size:28px;margin-bottom:8px">${d.icon}</div><div style="font-weight:700;font-size:14px;color:var(--tp);margin-bottom:3px">${d.name}</div><div style="font-size:12px;color:var(--ts);margin-bottom:10px;line-height:1.4">${d.desc}</div><span class="pill" style="background:${dc.bg};color:${dc.c}">${d.diff}</span> <span class="pill" style="background:var(--s2);color:var(--ts)">${d.dur}</span>`;
+  el.onclick=async()=>{
+    document.querySelectorAll('.drill-card').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');
+    const r=document.getElementById('drillResult');
+    r.innerHTML=`<div class="loading"><span class="spin">🔄</span><div>Loading drill guide...</div></div>`;
+    try{
+      const t=await ai([{role:'user',content:`Explain the tennis drill: "${d.name}" — ${d.desc}`}],`You are an expert tennis coach. Provide:\n🎯 PURPOSE & BENEFITS\n📋 HOW TO EXECUTE (4 steps)\n💡 3 PRO TIPS\n📊 PROGRESSIONS\n~240 words.`);
+      r.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><span style="font-size:22px">${d.icon}</span><span style="font-weight:700;font-size:15px;color:var(--tp)">${d.name}</span></div><div style="color:var(--ts);font-size:11px;margin-bottom:12px">${d.cat} · ${d.dur}</div><hr style="border:none;border-top:1px solid var(--bo);margin:0 0 14px"/><div class="ai-text">${t}</div>`;
+    }catch{r.innerHTML='<div class="empty">Failed. Try again.</div>';}
+  };
+  dg.appendChild(el);
+});
+
+// ── Strategy ──
+let stratStyle='',stratSurf='HARD';
+function selStyle(btn){document.querySelectorAll('.style-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');stratStyle=btn.textContent}
+function selSurf(btn){document.querySelectorAll('.surf-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');stratSurf=btn.textContent}
+async function genStrategy(){
+  const weak=document.getElementById('stratWeak').value,opp=document.getElementById('stratOpp').value;
+  const r=document.getElementById('stratResult');
+  r.innerHTML='<div class="loading"><span class="spin">🧠</span><div>Building game plan...</div></div>';
+  try{
+    const t=await ai([{role:'user',content:`Game plan for ${stratStyle||'intermediate'} player on ${stratSurf} vs ${opp||'baseline'} opponent. My weakness: ${weak||'none'}.`}],`You are a Grand Slam winning tennis coach. Create:\n🏆 OVERALL GAME PLAN\n🎯 4 TACTICAL OBJECTIVES\n💪 STRENGTHS TO EXPLOIT\n⚠️ OPPONENT WEAKNESSES\n📍 POSITIONING STRATEGY\n🧠 MENTAL GAME PLAN\n🏟️ SURFACE TIPS\n~280 words.`);
+    r.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--bo)"><span class="pill" style="background:rgba(200,255,0,.12);color:var(--a)">TACTICAL PLAN</span><span style="color:var(--ts);font-size:11px">${stratSurf.toLowerCase()} court</span></div><div class="ai-text">${t}</div>`;
+  }catch{r.innerHTML='<div class="empty">Failed. Try again.</div>';}
+}
+
+// ── Equipment ──
+['WILSON','BABOLAT','HEAD','NIKE','ASICS','LACOSTE'].forEach(b=>{
+  const s=document.createElement('span');
+  s.className='pill';s.style.cssText='background:var(--s2);border:1px solid var(--bo);color:var(--ts);margin-right:4px';
+  s.textContent=b;document.getElementById('partners').appendChild(s);
+});
+const PRODS=[
+  {brand:'Wilson',name:'Pro Staff RF97',type:'Racket',price:'$249',rating:'4.8',badge:'FEDERER CHOICE',img:'🎾'},
+  {brand:'Babolat',name:'Pure Aero Team',type:'Racket',price:'$189',rating:'4.7',badge:"RAFA'S PICK",img:'🎾'},
+  {brand:'Head',name:'Speed Pro',type:'Racket',price:'$219',rating:'4.6',badge:'DJOKOVIC PICK',img:'🎾'},
+  {brand:'Nike',name:'Court Air Zoom',type:'Shoes',price:'$139',rating:'4.5',badge:'BEST SELLER',img:'👟'},
+  {brand:'Asics',name:'Gel Resolution 9',type:'Shoes',price:'$149',rating:'4.7',badge:'TOUR FAVORITE',img:'👟'},
+  {brand:'Wilson',name:'Revolve 17g',type:'Strings',price:'$18',rating:'4.5',badge:'PRO STRING',img:'🪢'},
+];
+const pg=document.getElementById('products');
+PRODS.forEach(p=>{
+  pg.innerHTML+=`<div class="prod-card"><div class="prod-img">${p.img}</div><div style="display:flex;justify-content:space-between;margin-bottom:8px"><div><div style="color:var(--ts);font-size:10px;letter-spacing:1px">${p.brand}</div><div style="font-weight:700;font-size:14px;color:var(--tp)">${p.name}</div><div style="color:var(--ts);font-size:11px">${p.type}</div></div><div style="text-align:right"><div style="color:var(--a);font-weight:700;font-size:17px">${p.price}</div><div style="color:#FFB400;font-size:11px">★ ${p.rating}</div></div></div><div class="pill" style="background:rgba(200,255,0,.1);color:var(--a);margin-bottom:10px">${p.badge}</div><button class="btn-out" style="width:100%;font-size:11px;margin-top:6px">ADD TO CART</button></div>`;
+});
+
+// ── Streaming ──
+const MATCHES=[
+  {p1:'Djokovic',p2:'Alcaraz',score:'6-4, 3-5*',status:'LIVE',tournament:'Australian Open',round:'Semifinal'},
+  {p1:'Swiatek',p2:'Sabalenka',score:'4-6, 6-2, 2-1*',status:'LIVE',tournament:'French Open',round:'Final'},
+  {p1:'Sinner',p2:'Zverev',score:'6-3, 6-4',status:'FINAL',tournament:'US Open',round:'QF'},
+  {p1:'Medvedev',p2:'Fritz',score:'Today 18:00',status:'UPCOMING',tournament:'Wimbledon',round:'R16'},
+  {p1:'Gauff',p2:'Kvitova',score:'Today 20:00',status:'UPCOMING',tournament:'Roland Garros',round:'QF'},
+];
+const mg=document.getElementById('matches');
+MATCHES.forEach(m=>{
+  const isLive=m.status==='LIVE',isUp=m.status==='UPCOMING';
+  mg.innerHTML+=`<div class="match-row ${isLive?'live-match':''}">
+    <span class="pill" style="background:${isLive?'rgba(255,60,60,.15)':isUp?'rgba(200,255,0,.1)':'var(--s2)'};color:${isLive?'#FF5A5A':isUp?'#C8FF00':'var(--ts)'};min-width:60px;text-align:center">${isLive?'<span class="live-dot"></span>LIVE':m.status}</span>
+    <div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--tp)">${m.p1} <span style="color:var(--ts)">vs</span> ${m.p2}</div><div style="color:var(--ts);font-size:11px;margin-top:2px">${m.tournament} · ${m.round}</div></div>
+    <div style="color:${isLive?'#FFB400':'var(--ts)'};font-weight:700;font-size:14px;min-width:110px;text-align:center">${m.score}</div>
+    ${isLive?`<button style="background:#FF3B3B;color:white;border:none;padding:9px 16px;font-size:11px;font-weight:700;cursor:pointer;border-radius:4px">▶ WATCH LIVE</button>`:''}
+  </div>`;
+});
+
+// ── Chat ──
+let chatHistory=[{role:'assistant',content:'Hello! I\'m your AI Tennis Coach powered by Claude. Ask me anything — technique, strategy, rules, mental game, fitness, gear. 🎾'}];
+function renderMsgs(){
+  const c=document.getElementById('chatMsgs');c.innerHTML='';
+  chatHistory.forEach(m=>{
+    if(m.role==='user')c.innerHTML+=`<div class="msg-user"><div class="bubble-u">${m.content}</div></div>`;
+    else c.innerHTML+=`<div class="msg-ai"><div class="ai-avatar">🤖</div><div class="bubble-a">${m.content}</div></div>`;
+  });
+  c.scrollTop=c.scrollHeight;
+}
+['How do I improve my first serve?','Best strategy on clay courts?','How to stay calm when losing?','Which racket for a baseline player?'].forEach(q=>{
+  const ch=document.getElementById('chatChips');
+  const btn=document.createElement('button');btn.className='chip';btn.textContent=q;btn.onclick=()=>sendChat(q);ch.appendChild(btn);
+});
+async function sendChat(q){
+  const input=document.getElementById('chatInput');
+  const msg=q||input.value.trim();if(!msg)return;
+  input.value='';
+  chatHistory.push({role:'user',content:msg});renderMsgs();
+  chatHistory.push({role:'assistant',content:'Thinking...'});renderMsgs();
+  try{
+    const hist=chatHistory.slice(0,-1).map(m=>({role:m.role,content:m.content}));
+    const t=await ai(hist,`You are an elite AI tennis coach. Be concise, specific, encouraging. Use tennis terminology. Under 200 words.`);
+    chatHistory[chatHistory.length-1].content=t;
+  }catch{chatHistory[chatHistory.length-1].content='Sorry, connection error. Try again!';}
+  renderMsgs();
+}
+renderMsgs();
+</script>
+</body>
+</html>
